@@ -204,6 +204,14 @@ config.adviceLogger = {
   muteSoft: true // disable advice printout if it's soft
 }
 
+config.telegram = {
+  enabled  : true,
+  muteSoft : false, // disable advice printout if it's soft
+  bot_key   : "",
+  bot_secret: "",
+  chat_id   : ""
+}
+
 // do you want Gekko to calculate the profit of its own advice?
 config.profitSimulator = {
   enabled: true,

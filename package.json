@@ -7,7 +7,9 @@
     "bot",
     "bitcoin"
   ],
+  "main": "gekko.js",
   "scripts": {
+    "start": "node gekko.js",
     "test": "./node_modules/.bin/mocha test/*.js --recursive test -u tdd --reporter spec"
   },
   "author": "Mike van Rossum <mike@mvr.me>",

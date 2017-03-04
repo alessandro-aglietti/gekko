@@ -42,3 +42,6 @@ cexio.db
 history
 TMP_*
 .idea
+
+heroku.txt
+telegram.txt
