@@ -116,6 +116,14 @@ var plugins = [
     modes: ['realtime']
   },
   {
+    name: 'Telgram advice logger',
+      description: '',
+    slug: 'telegram',
+    async: false,
+    silent: true,
+    modes: ['realtime']
+  },
+  {
     name: 'Profit Simulator',
     description: 'Paper trader that logs fake profits.',
     slug: 'profitSimulator',

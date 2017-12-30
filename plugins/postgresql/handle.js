@@ -26,14 +26,15 @@ var plugins = require(util.dirs().gekko + 'plugins');
 
 var version = adapter.version;
 
-var dbName = config.watch.exchange.toLowerCase();
+//var dbName = config.watch.exchange.toLowerCase();
+var dbName = config.watch.dbName;
 
 var mode = util.gekkoMode();
 
-var connectionString = config.adapters.postgresql.connectionString+"/postgres";
+var connectionString = config.adapters.postgresql.connectionString;
 
 var checkClient = new pg.Client(connectionString);
-var client = new pg.Client(config.adapters.postgresql.connectionString+"/"+dbName);
+var client = new pg.Client(config.adapters.postgresql.connectionString);
 
 /* Postgres does not have 'create database if not exists' so we need to check if the db exists first.
 This requires connecting to the default postgres database first. Your postgres user will need appropriate rights. */

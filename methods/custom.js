@@ -1,63 +1,65 @@
-// If you want to use your own trading methods you can
-// write them here. For more information on everything you
-// can use please refer to this document:
-// 
-// https://github.com/askmike/gekko/blob/stable/docs/trading_methods.md
-// 
-// The example below is pretty stupid: on every new candle there is
-// a 10% chance it will recommand to change your position (to either
-// long or short).
+// helpers
+var _ = require('lodash');
+var log = require('../core/log.js');
 
+// configuration
 var config = require('../core/util.js').getConfig();
-var settings = config.custom;
-
-// Let's create our own method
+// let's create our own method
 var method = {};
 
-// Prepare everything our method needs
+// prepare everything our method needs
 method.init = function() {
-  this.currentTrend = 'long';
-  this.requiredHistory = 0;
+
+  this.name = 'Scalping';
+  this.currentTrend;
+  this.requiredHistory = config.tradingAdvisor.historySize;
+  // define the indicators we need
+  var parameters = {short: 13, long: 21, signal: 1};
+  this.addIndicator('macd1', 'MACD', parameters);
+  var parameters = {short: 21, long: 34, signal: 1};
+  this.addIndicator('macd2', 'MACD', parameters);
+  var parameters = {short: 34, long: 144, signal: 1};
+  this.addIndicator('macd3', 'MACD', parameters);
+  this.addIndicator('ema21', 'EMA', 21);
+  this.addIndicator('ema34', 'EMA', 34);
+  this.addIndicator('ema144', 'EMA', 144);
+  
+  // initial value
+  this.lastLongPrice = 0;
 }
 
-// What happens on every new candle?
+// what happens on every new candle?
 method.update = function(candle) {
-
-  // Get a random number between 0 and 1.
-  this.randomNumber = Math.random();
-
-  // There is a 10% chance it is smaller than 0.1
-  this.toUpdate = randomNumber < 0.1;
+  // nothing!  
 }
 
-// For debugging purposes.
+// for debugging purposes: log the last calculated
 method.log = function() {
-  console.log('calculated random number:');
-  console.log('\t', this.randomNumber.toFixed(3));
 }
 
-// Based on the newly calculated
-// information, check if we should
-// update or not.
 method.check = function() {
+  var macd1 = this.indicators.macd1.diff; 
+  var macd2 = this.indicators.macd2.diff;
+  var macd3 = this.indicators.macd3.diff;
+  var ema21 = this.indicators.ema21.result;
+  var ema34 = this.indicators.ema34.result;
+  var ema144 = this.indicators.ema144.result;
 
-  // Only continue if we have a new update.
-  if(!this.toUpdate)
-    return;
 
-  if(this.currentTrend === 'long') {
+  if(macd1>0 && macd2>0 && macd3>0 && ema21>ema34 && ema21>ema144) {
+    
+    // save the long price
+    this.lastLongPrice = this.candle.close;
+  log.debug('buy price:', this.lastPrice.toFixed(8));
+  this.advice('long ## buy price: ' + this.lastPrice.toFixed(8));
+  } 
+  
+    if(macd1<0 && macd2<0 && macd3<0 && ema21<ema34 && ema21<ema144) {  
+    this.advice('short ## sell price: ' + this.lastPrice.toFixed(8));
+  log.debug('sell price:', this.lastPrice.toFixed(8));
+  } 
 
-    // If it was long, set it to short
-    this.currentTrend = 'short';
-    this.advice('short');
 
-  } else {
-
-    // If it was short, set it to long
-    this.currentTrend = 'long';
-    this.advice('long');
-
-  }
 }
 
 module.exports = method;

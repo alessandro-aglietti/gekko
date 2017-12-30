@@ -2,6 +2,7 @@ var util   = require( '../core/util.js' );
 var _      = require( 'lodash' );
 var moment = require( 'moment' );
 var log    = require( '../core/log' );
+var request = require( 'request' );
 
 var Trader = function ( config ) {
   this.name = 'TheRock';
@@ -51,13 +52,18 @@ Trader.prototype.getPortfolio = function ( callback ) {
 }
 
 Trader.prototype.getTicker = function ( callback ) {
+  var self = this;
   log.debug( this.name, 'getTicker' );
-  var ticker = {
-    ask: 0.1,
-    bid: 0.1
+  var request_config = {
+    url: "https://api.therocktrading.com/v1/funds/BTCEUR/ticker"
   };
-  var err    = false;
-  callback( err, ticker )
+  request.get( request_config, function ( error, response, body ) {
+    log.debug( self.name, 'getTicker callback' );
+    console.log( 'error:', error ); // Print the error if one occurred
+    console.log( 'statusCode:', response && response.statusCode ); // Print the response status code if a response was received
+    console.log( 'body:', body ); // Print the HTML for the Google homepage.
+    callback( err, JSON.parse( body ) );
+  } );
 }
 
 Trader.prototype.getFee = function ( callback ) {
@@ -95,19 +101,44 @@ Trader.prototype.cancelOrder = function ( order ) {
 }
 
 Trader.prototype.getTrades = function ( since, callback, descending ) {
-  log.debug( this.name, 'getTrades' );
-  var trades = [
-    {
-      tid   : 1,
-      date  : 1488624999,
-      price : 100,
-      amount: 1
+  log.debug( this.name, 'getTrades since ' + since );
+  var self = this;
+
+  var request_config = {
+    url: "https://api.therocktrading.com/v1/funds/BTCEUR/trades",
+    qs : {
+      per_page: 200
     }
-  ];
+  };
 
-  var err = false;
+  if ( since ) {
+    var ISO_since           = (new Date( since )).toISOString();
+    request_config.qs.after = ISO_since;
+  }
 
-  callback( err, trades );
+  request.get( request_config, function ( error, response, body ) {
+      log.debug( self.name, 'getTicker callback' );
+      console.log( 'error:', error ); // Print the error if one occurred
+      console.log( 'statusCode:', response && response.statusCode ); // Print the response status code if a response was received
+      console.log( 'body:', body ); // Print the HTML for the Google homepage.
+
+      var parsed_body = JSON.parse( body );
+      var trt_trades  = parsed_body.trades;
+
+      var err    = false;
+      var trades = _.map( trt_trades, function ( trade ) {
+        var trade_ts_ms = (new Date( trade.date )).getTime();
+        return {
+          tid   : trade.id,
+          date  : trade_ts_ms / 1000,
+          price : trade.price,
+          amount: trade.amount
+        }
+      } );
+
+      callback( err, trades );
+    }
+  );
 }
 
 module.exports = Trader;

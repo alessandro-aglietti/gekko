@@ -2,6 +2,8 @@ var util = require('../core/util.js');
 var _ = require('lodash');
 var log = require('../core/log.js');
 var moment = require('moment');
+var sys = require('sys')
+var exec = require('child_process').exec;
 
 var mode = util.gekkoMode();
 
@@ -141,10 +143,10 @@ Logger.prototype.report = function(timespan) {
 
   log.info(`(PROFIT REPORT) original simulated balance:\t ${start} ${this.reportIn}`);
   log.info(`(PROFIT REPORT) current simulated balance:\t ${current} ${this.reportIn}`);
-  log.info(
-    `(PROFIT REPORT) simulated profit:\t\t ${this.round(this.profit)} ${this.reportIn}`,
-    '(' + this.round(this.relativeProfit) + '%)'
-  );
+  var profit_report_simulated_profit = `(€€€ REPORT) Profitto simulato:\t\t ${this.round(this.profit)} ${this.reportIn}` + '(' + this.round(this.relativeProfit) + '%)\t\t' + this.dates.end.utc().format('YYYY-MM-DD HH:mm:ss');
+  log.info(profit_report_simulated_profit);
+
+  exec('curl -d "chat_id={telegram_chat_id}&text=' + profit_report_simulated_profit + '" -vvvv "https://api.telegram.org/bot{telegram_bot_key_secret}/sendMessage"', function(){});
 
   if(timespan) {
     log.info(

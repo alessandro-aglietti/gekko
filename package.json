@@ -10,6 +10,7 @@
   "main": "gekko.js",
   "scripts": {
     "start": "node gekko.js",
+    "local": "DATABASE_URL='postgres://postgres:mysecretpassword@127.0.0.1:32768/postgres' node gekko.js",
     "test": "./node_modules/.bin/mocha test/*.js --recursive test -u tdd --reporter spec"
   },
   "author": "Mike van Rossum <mike@mvr.me>",
@@ -24,18 +25,21 @@
     "btc-markets": "0.0.6",
     "cexio": "0.0.x",
     "commander": "^2.9.0",
+    "express": "^4.15.0",
+    "gekko": "0.0.6",
     "kraken-api": "0.1.x",
     "lakebtc_nodejs": "0.1.x",
     "lodash": "2.x",
     "moment": "2.4.x",
     "okcoin-china": "0.0.7",
+    "pg": "6.1.2",
     "poloniex.js": "0.0.6",
     "prompt-lite": "0.1.1",
     "pushbullet": "1.4.3",
+    "request": "^2.80.0",
     "semver": "2.2.1",
     "sqlite3": "3.1.4",
-    "zaif.jp": "^0.1.4",
-    "gekko": "0.0.6"
+    "zaif.jp": "^0.1.4"
   },
   "devDependencies": {
     "chai": "^2.0.0",
